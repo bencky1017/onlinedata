@@ -4,92 +4,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>数据库增删改查API示例</title>
+    <title>OnlineData在线数据库</title>
     <link rel="stylesheet" href="./css/style.css">
     <!-- <script src="./js/index.js"></script> -->
 </head>
 
 <body>
     <div class="container">
-        <h1>任务列表</h1>
-        <form id="taskForm">
-            <input type="text" id="taskInput" placeholder="输入新任务" required>
-            <button type="submit">添加</button>
-        </form>
-        <ul id="taskList"></ul>
+        <h1>影视作品管理平台</h1>
+        <button data-button="search" onclick="showTable()">刷新表格</button>
+        <div class="dataTable">
+            <table id="dataTable" border="1">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>名称</th>
+                        <th>类型</th>
+                        <th>国籍</th>
+                        <th>首字母</th>
+                        <th>是否看过</th>
+                        <th>修改时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <!-- <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Country</th>
+                                <th>Initial</th>
+                                <th>Watched</th>
+                                <th>CreateTime</th>
+                                <th>Operation</th>
+                            </tr>
+                        </thead> -->
+                <tbody>
+                    <!-- 表格数据将通过 JavaScript 动态填充到这里 -->
+                </tbody>
+            </table>
+        </div>
+        <div class="video_manage">
+            <input type="number" id="id" placeholder="ID（仅修改/删除需要）" min='1'>
+            <input type="text" id="name" placeholder="作品名称" value="">
+            <select id="type">
+                <option value="">- 类型 -</option>
+                <!-- 选项将由JavaScript动态生成 -->
+            </select>
+            <select id="country">
+                <option value="">- 国籍 -</option>
+                <!-- 选项将由JavaScript动态生成 -->
+            </select>
+            <input type="text" id="initial" placeholder="首字母（可选）" maxlength="1" value>
+        </div>
+        <div class="video_manage">
+            <button data-button="create" onclick="createItem()">创建记录</button>
+            <button data-button="search" onclick="searchItem()">查询记录</button>
+            <button data-button="query" onclick="queryItem()">搜索记录</button>
+            <button data-button="update" onclick="updateItem()">修改记录</button>
+            <button data-button="delete" onclick="deleteItem()">删除记录</button>
+            <button data-button="info"
+                onclick="clearValue(['id', 'name', 'type', 'country', 'initial']),searchItem()">清空记录</button>
+        </div>
+        <!-- 结果展示 -->
+        <div class="records" id="records"></div>
+        <hr />
     </div>
+    <script src="https://unpkg.com/pinyin-pro@3"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="js/app.js"></script>
-    <hr/>
-    <h1>CRUD API Example</h1>
-    <h2>Create Record</h2>
-    <!-- <input type="number" id="createId" placeholder="Enter ID"> -->
-    <input type="text" id="createName" placeholder="Enter Name">
-    <input type="text" id="createAge" placeholder="Enter Age">
-    <input type="text" id="createPhone" placeholder="Enter Phone">
-    <input type="text" id="createAddress" placeholder="Enter Address">
-    <button onclick="createRecord()">创建记录</button>
-
-    <h2>Read Record</h2>
-    <input type="text" id="readId" placeholder="Enter ID" value="20">
-    <button onclick="readRecord()">读取记录</button>
-    <button onclick="totext()">切换格式化</button>
-    <div><textarea id="readtext" cols="100" rows="4" maxrows="120" placeholder="输出显示查询到的记录内容"></textarea>
-    </div>
-    <div>
-        <pre id='preId' placeholder="格式化内容"></pre>
-    </div>
-
-    <h2>Update Record</h2>
-    <input type="text" id="updateId" placeholder="Enter ID">
-    <input type="text" id="updateName" placeholder="Enter Name">
-    <input type="text" id="updateAge" placeholder="Enter Age">
-    <input type="text" id="updatePhone" placeholder="Enter Phone">
-    <input type="text" id="updateAddress" placeholder="Enter Address">
-    <button onclick="updateRecord()">更新记录</button>
-
-    <h2>Delete Record</h2>
-    <input type="number" id="deleteId" placeholder="Enter ID">
-    <button onclick="deleteRecord()">删除记录</button>
-
-    <h2>Upload Files</h2>
-    <form enctype="multipart/form-data">
-        <input type="file" name="file" id="fileInput">
-        <button type="button" id="uploadButton" onclick="upload_file()">上传文件</button>
-    </form>
-    <br /><button onclick="get_data();get_file()">刷新列表</button>
-    <table id="fileTable" border='1'>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>file_name</th>
-                <th>file_link</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- 表格数据将通过 JavaScript 动态填充到这里 -->
-        </tbody>
-    </table>
-    </div>
-
-    <table id="dataTable" border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Age</th>
-                <th>Phone</th>
-                <th>Address</th>
-                <th>CreateTime</th>
-                <th>UpdateTime</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- 表格数据将通过 JavaScript 动态填充到这里 -->
-        </tbody>
-    </table>
-    <!-- <script src="./js/index.js"></script> -->
-    
+    <script src="js/test.js"></script>
 </body>
 
 </html>
