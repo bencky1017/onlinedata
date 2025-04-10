@@ -44,7 +44,7 @@ function get_first_char(word) {
 // 自动生成首字母
 function autoGenerate() {
     document.getElementById('name').addEventListener('input', function () {
-        var get_name = document.getElementById('name').value;
+        var get_name = document.getElementById('name').value.trim();
         document.getElementById('initial').value = get_name ? /^[0-9a-zA-Z]$/.test(get_first_char(get_name)) ? get_first_char(get_name) : '' : '';
     });
 }
@@ -57,9 +57,22 @@ function clearValue(selectors) {
             processedSelector = `#${selector}`;
         }
         document.querySelectorAll(processedSelector).forEach(element => {
-            element.value = '';
+            if (element.type === 'checkbox') {
+                element.checked = false; // 清空复选框状态
+            } else {
+                element.value = ''; // 清空其他输入框
+            }
         });
-    })
+    });
+}
+
+// 切换复选框状态
+function toggleCheckbox(currentId, otherId) {
+    const currentCheckbox = document.getElementById(currentId);
+    const otherCheckbox = document.getElementById(otherId);
+    if (currentCheckbox.checked) {
+        otherCheckbox.checked = false; // 取消另一个复选框的选中状态
+    }
 }
 
 /**
@@ -179,7 +192,7 @@ function displayRecords(data) {
             <h3>${letter}</h3>
             ${grouped[letter].map(item => `
                 <div class="${item.watched ? 'watched_item' : ''}">
-                    [${item.id}] ${item.name} - ${item.type}（${item.country}）
+                    <span class="text_content">[${item.id}] ${item.name} - ${item.type}（${item.country}）</span>
                     <small>${new Date(item.createtime).toLocaleString()}</small>
                     <button class="toggle_btn ${item.watched ? 'watched' : 'unwatched'}" 
                             onclick="toggleWatched(${item.id}, ${item.watched})">
@@ -200,7 +213,7 @@ async function searchItem(showTip = true) {
     const { data, error } = await supabase
         .from(DATABASE_VIDEO)
         .select('*')
-        .order('initial', { ascending: true });
+        .order('id', { ascending: true });
     if (!error) {
         displayRecords(data);
         showTable(data);
@@ -210,11 +223,13 @@ async function searchItem(showTip = true) {
 
 // 搜索记录
 async function queryItem() {
+    const id = document.getElementById('id').value;
     const name = document.getElementById('name').value.trim();
     const type = document.getElementById('type').value;
     const country = document.getElementById('country').value;
-    const initial = document.getElementById('initial').value;
-    const watched = document.querySelector('input[name="watched"]:checked')?.value;
+    const initial = document.getElementById('initial').value.toUpperCase();
+    const watched = document.getElementById('watched').checked;
+    const unwatched = document.getElementById('unwatched').checked;
 
     let query = supabase.from(DATABASE_VIDEO).select('*');
 
@@ -231,16 +246,18 @@ async function queryItem() {
     if (initial) {
         filters.push({ column: 'initial', operator: 'eq', value: initial });
     }
-    if (watched !== undefined) {
-        filters.push({ column: 'watched', operator: 'eq', value: watched === 'true' ? 1 : 0 });
+    if (watched) {
+        filters.push({ column: 'watched', operator: 'eq', value: 1 });
+    }
+    if (unwatched) {
+        filters.push({ column: 'watched', operator: 'eq', value: 0 });
     }
 
     filters.forEach(filter => {
         query = query.filter(filter.column, filter.operator, filter.value);
     });
 
-    const { data, error } = await query.order('initial', { ascending: true });
-    console.log(data)
+    const { data, error } = await query.order('id', { ascending: true });
 
     if (!error) {
         displayRecords(data);
@@ -274,7 +291,7 @@ async function createItem() {
     } else {
         tips('名称不能为空', 'warning');
     }
-    clearValue(['id', 'name', 'type', 'country', 'initial']);
+    clearValue(['id', 'name', 'type', 'country', 'initial', 'watched', 'unwatched']);
 }
 
 // 修改记录
@@ -283,7 +300,16 @@ async function updateItem() {
     const name = document.getElementById('name').value;
     var modify_field = id ? 'id' : 'name';
     var modify_value = id ? id : name;
+
     if (modify_value) {
+        // 构建确认信息
+        const confirmMessage = `确定要修改这条记录吗？\n\nID： ${id || '未指定'}\n名称： ${name}`;
+        const confirmUpdate = window.confirm(confirmMessage);
+        if (!confirmUpdate) {
+            tips('操作已取消', 'log');
+            return;
+        }
+
         const { error } = await supabase
             .from(DATABASE_VIDEO)
             .update({
@@ -294,14 +320,17 @@ async function updateItem() {
                 createtime: new Date().toLocaleString()
             })
             .eq(modify_field, modify_value);
+
         if (!error) {
             searchItem(false);
             tips('修改成功', 'success');
+        } else {
+            tips('修改失败', 'error');
         }
     } else {
         tips('ID 或 名称 不能为空', 'warning');
     }
-    clearValue(['id', 'name', 'type', 'country', 'initial']);
+    clearValue(['id', 'name', 'type', 'country', 'initial', 'watched', 'unwatched']);
 }
 
 // 删除记录
@@ -337,22 +366,57 @@ async function deleteItem(id = null) {
     } else {
         tips('ID 不能为空', 'warning');
     }
-    clearValue(['id', 'name', 'type', 'country', 'initial']);
+    clearValue(['id', 'name', 'type', 'country', 'initial', 'watched', 'unwatched']);
+}
+
+// 读取记录
+async function readItem(id) {
+    if (id) {
+        const { data, error } = await supabase
+            .from(DATABASE_VIDEO)
+            .select('*')
+            .eq('id', id)
+            .single();
+        if (!error && data) {
+            document.getElementById('id').value = data.id;
+            document.getElementById('name').value = data.name;
+            document.getElementById('type').value = data.type;
+            document.getElementById('country').value = data.country;
+            document.getElementById('initial').value = data.initial;
+            document.getElementById('watched').checked = data.watched === 1;
+            document.getElementById('unwatched').checked = data.watched === 0;
+            tips('读取成功', 'success');
+        } else {
+            tips('读取失败', 'error');
+        }
+    } else {
+        tips('ID 不能为空', 'warning');
+    }
 }
 
 // 显示表格数据
-async function showTable(data = null) {
+async function showTable(data = null, ascending = null) {
+    let sortColumn = 'id';
+    let sortOrder = true;
+
+    if (ascending !== null) {
+        sortColumn = 'initial';
+        sortOrder = ascending;
+    }
+    console.log(sortColumn, sortOrder)
+
     if (!data) {
         const response = await supabase
             .from(DATABASE_VIDEO)
             .select('*')
-            .order('id', { ascending: true });
+            .order(sortColumn, { ascending: sortOrder });
         if (response.error) {
             tips('加载表格数据失败', 'error');
             return;
         }
         data = response.data;
     }
+
     const tbody = document.querySelector('#dataTable tbody');
     tbody.innerHTML = '';
 
@@ -373,12 +437,20 @@ async function showTable(data = null) {
             </td>
             <td>${new Date(item.createtime).toLocaleString()}</td>
             <td>
+                <button onclick="readItem('${item.id}')" data-button="update" >修改</button>
                 <button onclick="deleteItem('${item.id}')">删除</button>
             </td>
         `;
         tbody.appendChild(row);
     });
     tips('加载表格数据成功', 'success');
+}
+
+// 添加排序控制函数
+function sortTable() {
+    const sortSelect = document.getElementById('sortOrder');
+    const ascending = sortSelect.value === '' ? null : sortSelect.value === 'true';
+    showTable(null, ascending);
 }
 
 // 切换观看状态

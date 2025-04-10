@@ -23,7 +23,7 @@ input[type="file"] {
 }
 
 button {
-    height: 32px;
+    height: 40px;
     width: 100px;
     margin: 4px 4px;
     border-radius: 8px;
@@ -143,8 +143,130 @@ li {
 
 
 /* *************** 类名编辑区 *************** */
-.video_manage {
-    margin: 10px;
+
+.control_panel {
+    margin: 20px 0px;
+    padding: 10px;
+    background: #f8fafe;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #ebeef5;
+}
+
+/* 配套CSS样式 */
+
+.filter_group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 10px;
+    margin-bottom: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input_group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex-grow: 1;
+}
+
+/* 智能输入框 */
+.smart_input {
+    flex: 1 1 200px;
+    height: 40px;
+    padding: 0 15px;
+    border: 2px solid #e0e7ff;
+    border-radius: 8px;
+    transition: all 0.3s;
+    background: #f8fafe;
+}
+
+.smart_input:focus {
+    outline: none;
+    border-color: #409eff;
+    box-shadow: 0 0 8px rgba(64, 158, 255, 0.2);
+}
+
+/* 下拉菜单 */
+.select_input {
+    flex: 1 1 100px;
+    height: calc(40px + 3.48px);
+    padding: 0 10px;
+    border: 2px solid #e0e7ff;
+    border-radius: 8px;
+    appearance: none;
+    background: #f8fafe url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat right 10px center;
+    background-size: 16px;
+}
+
+.select_input:focus {
+    outline: none;
+    border-color: #409eff;
+    box-shadow: 0 0 8px rgba(64, 158, 255, 0.2);
+}
+
+/* 短输入框 */
+.short_input {
+    outline: none;
+    width: 80px;
+    text-align: center;
+    height: 40px;
+    border: 2px solid #e0e7ff;
+    border-radius: 8px;
+    transition: all 0.3s;
+    background: #f8fafe;
+}
+
+.short_input:focus {
+    outline: none;
+    border-color: #409eff;
+    box-shadow: 0 0 8px rgba(64, 158, 255, 0.2);
+}
+
+/* 状态切换 */
+.watch_group {
+    margin-right: 5px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.watch_group span {
+    color: #4b5563;
+    font-size: 14px;
+}
+
+/* 操作按钮组 */
+.button_group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.button_btn {
+    flex: 1 1 auto;
+    height: 42px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.button_btn .icon {
+    font-size: 16px;
+}
+
+.button_btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .dataTable {
@@ -209,15 +331,17 @@ li {
     background: #fafafa;
     border-radius: 8px;
     border: 1px solid transparent;
-    border-left: 4px solid #41bd4b;
-    transition: all 0.2s;
+    /* border-left: 4px solid #41bd4b; */
+    transition: all 0.08s;
 }
 
 .letter_group>div:hover {
     background: #ffffff;
     border-color: #ebeef5;
     border-left: 4px solid #f7ea36;
+    margin-right: -4px;
     /* #4185bd #41bd4b */
+    transition: all 0.08s;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
@@ -230,10 +354,6 @@ li {
 }
 
 .watched_item {
-    padding: 0px 5px;
-    color: #bbbbbb !important;
-    text-decoration: line-through;
-    opacity: 0.7;
     position: relative;
 }
 
@@ -248,7 +368,23 @@ li {
     font-size: 16px;
 }
 
-tr.watched_row td {
+.watched_item .text_content {
+    color: #bbbbbb;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.watched_item small {
+    color: #bbbbbb;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.watched_item button {
+    opacity: 0.7;
+}
+
+.watched_row td {
     color: #bbbbbb;
 }
 
@@ -308,6 +444,64 @@ tr.watched_row td {
     max-width: 72px;
     padding: 0px 5px;
     border-radius: 4px;
+}
+
+#watched,
+#unwatched {
+    flex: 1;
+    appearance: none;
+    width: 30px;
+    height: 30px;
+    margin-right: 5px;
+    border: 2px solid #e0e7ff;
+    border-radius: 6px;
+    background-color: #f8fafe;
+    cursor: pointer;
+    transition: all 0.2s;
+    vertical-align: middle;
+}
+
+#watched:checked,
+#unwatched:checked {
+    background-color: #409eff;
+    border-color: #409eff;
+    position: relative;
+}
+
+#watched:checked::after,
+#unwatched:checked::after {
+    content: "✓";
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+label[for="watched"],
+label[for="unwatched"] {
+    margin: 2px 0px;
+    min-width: 80px;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+#sortOrder {
+    flex: 1 1 100px;
+    padding: 0 10px;
+    border: 2px solid #e0e7ff;
+    border-radius: 8px;
+    background: #f8fafe;
+    background-size: 16px;
+}
+
+#sortOrder:focus,
+#sortOrder:hover {
+    outline: none;
+    border-color: #409eff;
+    box-shadow: 0 0 8px rgba(64, 158, 255, 0.2);
 }
 
 
@@ -385,7 +579,6 @@ tr.watched_row td {
 }
 
 
-
 /* *************** 响应式优化 *************** */
 @media (max-width: 768px) {
     .letter_group>div {
@@ -409,3 +602,7 @@ tr.watched_row td {
         top: 28px;
     }
 }
+
+
+
+/* ************************************* */

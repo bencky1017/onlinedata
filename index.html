@@ -12,9 +12,17 @@
 <body>
     <div class="container">
         <h1>影视作品管理平台</h1>
-        <button data-button="search" onclick="showTable()">刷新表格</button>
+        <div class="control_panel">
+            <button data-button="search" onclick="sortTable()">🔄刷新表格</button>
+            <select id="sortOrder" onchange="sortTable()">
+                <option value="">- 排序 -</option>
+                <option value="true">A→Z 正序</option>
+                <option value="false">Z→A 倒序</option>
+            </select>
+            <button data-button="create" onclick="location.href='#filterGroup'">跳转</button>
+        </div>
         <div class="dataTable">
-            <table id="dataTable" border="1">
+            <table id="dataTable" border="0">
                 <thead>
                     <tr>
                         <th>序号</th>
@@ -44,28 +52,57 @@
                 </tbody>
             </table>
         </div>
-        <div class="video_manage">
-            <input type="number" id="id" placeholder="ID（仅修改/删除需要）" min='1'>
-            <input type="text" id="name" placeholder="作品名称" value="">
-            <select id="type">
-                <option value="">- 类型 -</option>
-                <!-- 选项将由JavaScript动态生成 -->
-            </select>
-            <select id="country">
-                <option value="">- 国籍 -</option>
-                <!-- 选项将由JavaScript动态生成 -->
-            </select>
-            <input type="text" id="initial" placeholder="首字母（可选）" maxlength="1" value>
+        <div class="control_panel">
+            <!-- 搜索条件区域 -->
+            <div class="filter_group" id="filterGroup">
+                <div class="input_group">
+                    <input type="number" id="id" placeholder="ID" class="smart_input" min="1">
+                    <input type="text" id="name" placeholder="作品名称" class="smart_input">
+                    <select id="type" class="select_input">
+                        <option value="">- 类型 -</option>
+                    </select>
+                    <select id="country" class="select_input">
+                        <option value="">- 国籍 -</option>
+                    </select>
+                    <input type="text" id="initial" placeholder="首字母" class="short_input" maxlength="1">
+                </div>
+                <div class="watch_group">
+                    <label for="watched">
+                        <input type="checkbox" id="watched" value="已看" onclick="toggleCheckbox('watched', 'unwatched')">
+                        <span>已看</span>
+                    </label>
+                    <label for="unwatched">
+                        <input type="checkbox" id="unwatched" value="未看"
+                            onclick="toggleCheckbox('unwatched', 'watched')">
+                        <span>未看</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 操作按钮区域 -->
+            <div class="button_group">
+                <button class="button_btn" data-button="create" onclick="createItem()">
+                    <span class="icon">➕</span>创建
+                </button>
+                <button class="button_btn" data-button="search" onclick="searchItem()">
+                    <span class="icon">👓</span>查询
+                </button>
+                <button class="button_btn" data-button="query" onclick="queryItem()">
+                    <span class="icon">🔍</span>搜索
+                </button>
+                <button class="button_btn" data-button="update" onclick="updateItem()">
+                    <span class="icon">✏️</span>修改
+                </button>
+                <button class="button_btn" data-button="delete" onclick="deleteItem()">
+                    <span class="icon">❌</span>删除
+                </button>
+                <button class="button_btn" data-button="info"
+                    onclick="clearValue(['id', 'name', 'type', 'country', 'initial', 'watched','unwatched']),searchItem()">
+                    <span class="icon">🗑️</span>清空
+                </button>
+            </div>
         </div>
-        <div class="video_manage">
-            <button data-button="create" onclick="createItem()">创建记录</button>
-            <button data-button="search" onclick="searchItem()">查询记录</button>
-            <button data-button="query" onclick="queryItem()">搜索记录</button>
-            <button data-button="update" onclick="updateItem()">修改记录</button>
-            <button data-button="delete" onclick="deleteItem()">删除记录</button>
-            <button data-button="info"
-                onclick="clearValue(['id', 'name', 'type', 'country', 'initial']),searchItem()">清空记录</button>
-        </div>
+
         <!-- 结果展示 -->
         <div class="records" id="records"></div>
         <hr />
