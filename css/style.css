@@ -145,7 +145,7 @@ li {
 /* *************** 类名编辑区 *************** */
 
 .control_panel {
-    margin: 20px 0px;
+    margin: 10px 0px 20px 0px;
     padding: 10px;
     background: #f8fafe;
     border-radius: 12px;
@@ -268,6 +268,50 @@ li {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+.fore_panel {
+    margin: 20px 0px;
+    padding: 10px;
+    background: #f8fafe;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #ebeef5;
+}
+
+.button_jump{
+    width: 80px;
+}
+
+.count {
+    height: 40px;
+    line-height: 40px;
+    padding: 0 20px;
+    text-align: center;
+    vertical-align: middle;
+    background: rgba(64, 158, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.count span:first-child {
+    color: #409eff;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+#totalCount {
+    color: #2c5c8a;
+    font-weight: bold;
+    font-size: 18px;
+    min-width: 36px;
+    text-align: center;
+}
+
+.count:hover {
+    background: rgba(64, 158, 255, 0.15);
+}
+
 
 .dataTable {
     margin: 10px 0;

@@ -6,20 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OnlineData在线数据库</title>
     <link rel="stylesheet" href="./css/style.css">
-    <!-- <script src="./js/index.js"></script> -->
+    <link rel="icon" href="favicon.png" type="image/png">
 </head>
 
 <body>
     <div class="container">
         <h1>影视作品管理平台</h1>
-        <div class="control_panel">
+        <div class="fore_panel">
             <button data-button="search" onclick="sortTable()">🔄刷新表格</button>
             <select id="sortOrder" onchange="sortTable()">
                 <option value="">- 排序 -</option>
                 <option value="true">A→Z 正序</option>
                 <option value="false">Z→A 倒序</option>
             </select>
-            <button data-button="create" onclick="location.href='#filterGroup'">跳转</button>
+            <button data-button="create" class="button_jump" onclick="location.href='#filterGroup'">跳转</button>
         </div>
         <div class="dataTable">
             <table id="dataTable" border="0">
@@ -51,6 +51,10 @@
                     <!-- 表格数据将通过 JavaScript 动态填充到这里 -->
                 </tbody>
             </table>
+        </div>
+        <div class="count">
+            <span>总计：</span>
+            <span id="totalCount">0</span>
         </div>
         <div class="control_panel">
             <!-- 搜索条件区域 -->

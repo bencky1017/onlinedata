@@ -173,6 +173,15 @@ async function getCountry() {
     data.forEach(item => { select.add(new Option(item.countryname, item.countryname)); });
 }
 
+// 统计记录数
+function count(data) {
+    const count = data.length;
+    const countElement = document.getElementById('totalCount');
+    if (countElement) {
+        countElement.innerHTML = `${count}`;
+    }
+}
+
 // 显示记录
 function displayRecords(data) {
     const grouped = data.reduce((acc, item) => {
@@ -206,6 +215,7 @@ function displayRecords(data) {
     `).join('');
 
     document.getElementById('records').innerHTML = html;
+    count(data);
 }
 
 // 查询记录
@@ -271,7 +281,6 @@ async function queryItem() {
 // 创建记录
 async function createItem() {
     const name = document.getElementById('name').value.trim();
-    console.log(!name)
     if (name) {
         const { data, error } = await supabase
             .from(DATABASE_VIDEO)
@@ -403,7 +412,6 @@ async function showTable(data = null, ascending = null) {
         sortColumn = 'initial';
         sortOrder = ascending;
     }
-    console.log(sortColumn, sortOrder)
 
     if (!data) {
         const response = await supabase
