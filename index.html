@@ -10,8 +10,65 @@
 </head>
 
 <body>
+    <div class="top_nav">
+        <h1 class="main_title">🎬影视作品管理平台</h1>
+        <div class="auth_buttons">
+            <button id="loginBtn" class="login_btn" onclick="handleAuth('login')">登录</button>
+            <button id="registerBtn" class="register_btn" onclick="handleAuth('register')">注册</button>
+        </div>
+
+        <!-- 登录弹窗 -->
+        <div id="authModal" class="modal">
+            <div class="modal_content">
+                <span class="close" onclick="closeModal(event)">&times;</span>
+                <h3>🎉 欢迎回来</h3>
+                <form id="authForm" class="form">
+                    <div class="input_group">
+                        <label>邮箱</label>
+                        <input type="email" id="loginEmail" placeholder="example@domain.com" autocomplete="email">
+                    </div>
+                    <div class="input_group">
+                        <label>密码</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••"
+                            autocomplete="current-password">
+                    </div>
+                    <button type="button" onclick="submitLogin()">立即登录</button>
+                </form>
+                <div class="form_footer">
+                    没有账号？ <a onclick="handleAuth('register')">立即注册</a>
+                </div>
+            </div>
+        </div>
+        <!-- 注册弹窗 -->
+        <div id="registerModal" class="modal">
+            <div class="modal_content">
+                <span class="close" onclick="closeModal(event)">&times;</span>
+                <h3>🚀 注册账户</h3>
+                <form id="registerForm" class="form">
+                    <div class="input_group">
+                        <label>邮箱</label>
+                        <input type="email" id="registerEmail" placeholder="example@domain.com" autocomplete="email">
+                    </div>
+                    <div class="input_group">
+                        <label>密码</label>
+                        <input type="password" id="registerPassword" placeholder="至少6位字符" autocomplete="new-password">
+                    </div>
+                    <button type="button" onclick="submitRegister()">立即注册</button>
+                </form>
+                <div class="form_footer">
+                    已有账号？ <a onclick="handleAuth('login')">立即登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 修改操作按钮 -->
+    <!-- <div>
+        <button data-admin onclick="deleteItem()">删除</button>
+        <button data-admin onclick="updateItem()">修改</button>
+        <button data-user onclick="createItem()">新增</button>
+    </div> -->
     <div class="container">
-        <h1>影视作品管理平台</h1>
+        <!-- 顶部操作区 -->
         <div class="fore_panel">
             <button data-button="search" onclick="sortTable()">🔄刷新表格</button>
             <select id="sortOrder" onchange="sortTable()">
@@ -19,8 +76,11 @@
                 <option value="true">A→Z 正序</option>
                 <option value="false">Z→A 倒序</option>
             </select>
-            <button data-button="create" class="button_jump" onclick="location.href='#filterGroup'">跳转</button>
+            <button data-button="create" class="button_jump" onclick="location.href='#controlPanel'">跳转</button>
+            <button data-button="info" class="button_jump" onclick="clearAllSelections()">取消选择</button>
+            <button data-button="delete" class="button_jump" onclick="scrollToBottom()">测试</button>
         </div>
+        <!-- 表格展示区 -->
         <div class="dataTable">
             <table id="dataTable" border="0">
                 <thead>
@@ -52,13 +112,21 @@
                 </tbody>
             </table>
         </div>
+        <!-- 数据统计区 -->
         <div class="count">
-            <span>总计：</span>
-            <span id="totalCount">0</span>
+            <div class="total">
+                <span>总计：</span>
+                <span id="totalCount">0</span>
+            </div>
+            <div class="delete">
+                <span>选择删除：</span>
+                <span id="deletedCount">0</span>
+            </div>
         </div>
-        <div class="control_panel">
+        <!-- 控制面板 -->
+        <div class="control_panel" id="controlPanel">
             <!-- 搜索条件区域 -->
-            <div class="filter_group" id="filterGroup">
+            <div class="filter_group">
                 <div class="input_group">
                     <input type="number" id="id" placeholder="ID" class="smart_input" min="1">
                     <input type="text" id="name" placeholder="作品名称" class="smart_input">
@@ -82,16 +150,15 @@
                     </label>
                 </div>
             </div>
-
             <!-- 操作按钮区域 -->
             <div class="button_group">
                 <button class="button_btn" data-button="create" onclick="createItem()">
                     <span class="icon">➕</span>创建
                 </button>
+                <!-- <button class="button_btn" data-button="search" onclick="queryItem()">
+                    <span class="icon">👓</span>刷新
+                </button> -->
                 <button class="button_btn" data-button="search" onclick="searchItem()">
-                    <span class="icon">👓</span>查询
-                </button>
-                <button class="button_btn" data-button="query" onclick="queryItem()">
                     <span class="icon">🔍</span>搜索
                 </button>
                 <button class="button_btn" data-button="update" onclick="updateItem()">
@@ -100,21 +167,19 @@
                 <button class="button_btn" data-button="delete" onclick="deleteItem()">
                     <span class="icon">❌</span>删除
                 </button>
-                <button class="button_btn" data-button="info"
-                    onclick="clearValue(['id', 'name', 'type', 'country', 'initial', 'watched','unwatched']),searchItem()">
+                <button class="button_btn" data-button="info" onclick="clearValue()">
                     <span class="icon">🗑️</span>清空
                 </button>
             </div>
         </div>
-
-        <!-- 结果展示 -->
+        <!-- 结果展示区 -->
         <div class="records" id="records"></div>
         <hr />
     </div>
     <script src="https://unpkg.com/pinyin-pro@3"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="js/app.js"></script>
-    <script src="js/test.js"></script>
+    <!-- <script src="js/util.js"></script> -->
 </body>
 
 </html>
