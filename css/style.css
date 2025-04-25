@@ -105,7 +105,29 @@ tbody tr:last-child td:last-child {
     border-bottom-right-radius: 8px;
 }
 
+/* 新增行高亮动画 */
+@keyframes flash {
+    0% {
+        background: rgba(103, 194, 58, 0.1);
+    }
 
+    30% {
+        background: rgba(103, 194, 58, 0.1);
+    }
+
+    50% {
+        background: rgba(103, 194, 58, 0.3);
+    }
+
+    100% {
+        background: transparent;
+    }
+}
+
+/* 新增行样式 */
+tbody tr.new_row_flash td {
+    animation: flash 2s ease-in-out !important;
+}
 
 /* 斑马纹样式 */
 tbody tr:nth-child(even) td {
@@ -867,28 +889,6 @@ label[for="unwatched"] {
     background: rgba(64, 158, 255, 0.15);
 }
 
-/* 新增行高亮动画 */
-@keyframes flash {
-    0% {
-        background: rgba(103, 194, 58, 0.1);
-    }
-
-    30% {
-        background: rgba(103, 194, 58, 0.1);
-    }
-
-    50% {
-        background: rgba(103, 194, 58, 0.3);
-    }
-
-    100% {
-        background: transparent;
-    }
-}
-
-.new_row_flash {
-    animation: flash 2s ease-in-out;
-}
 
 /* *************** 响应式优化 *************** */
 @media (max-width: 768px) {

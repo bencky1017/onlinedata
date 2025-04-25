@@ -79,7 +79,7 @@ let lastSelectedId = null;
 supabase = supabase.createClient(DB_CONFIG.URL, DB_CONFIG.KEY);
 // supabase.auth.onAuthStateChange(handleAuthStateChange);
 
-tips('正在加载数据...', 'info');
+tips('正在初始化加载数据...', 'info');
 document.addEventListener('DOMContentLoaded', () => {
     initApplication();
 });
@@ -281,6 +281,7 @@ function buildBaseQuery(filters) {
 // 查询记录（加载）
 async function searchItem(showTip = true, scroll = false, id = null) {
     // if (!(await validatePermission('read'))) return;
+    tips('正在查询数据...', 'info');
     const data = await queryDatabase(getCurrentFilters());
     updateUIComponents(data);
 
@@ -511,6 +512,30 @@ async function batchDelete(ids) {
     clearAllSelections();
 }
 
+// 切换记录观看状态
+async function toggleWatched(id, currentStatus) {
+    tips('正在更新状态...', 'info');
+    const { error } = await supabase
+        .from(TABLE.VIDEO)
+        .update({
+            watched: !currentStatus ? 1 : 0,
+            createtime: new Date().toLocaleString()
+        })
+        .eq('id', id);
+
+    if (!error) {
+        // 获取当前筛选条件
+        const data = await queryDatabase(getCurrentFilters());
+        updateUIComponents(data);
+        // const filters = getCurrentFilters();
+        // await queryItemWithFilters(filters); // 保留当前筛选状态
+        // searchItem(false);
+        // updateTableDisplay();
+        tips(`已标记为${!currentStatus ? '已看' : '未看'}`, 'success');
+    } else {
+        tips('状态更新失败', 'error');
+    }
+}
 
 
 // ======================== UI更新模块 ========================
@@ -885,6 +910,8 @@ async function sortTable() {
     updateCountDisplay(data);
     updateDeleteDisplay(0);
 }
+
+
 
 
 // ======================== 事件处理模块 ========================
