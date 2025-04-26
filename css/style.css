@@ -253,8 +253,7 @@ li {
 }
 
 .canSelect {
-    /* user-select: text; */
-    user-select: all;
+    user-select: text;
 }
 
 

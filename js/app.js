@@ -363,7 +363,7 @@ async function createItem() {
         return;
     }
     const newItem = {
-        name: document.getElementById('name').value,
+        name: document.getElementById('name').value.trim(),
         type: document.getElementById('type').value,
         country: document.getElementById('country').value,
         initial: document.getElementById('initial').value,
@@ -371,10 +371,18 @@ async function createItem() {
         createtime: new Date().toLocaleString()
     };
     try {
-        // 记录当前滚动位置
-        const tableBody = document.querySelector('.dataTable');
-        // const prevScrollHeight = tableBody.scrollHeight;
+        tips('正在检查重复名称...', 'info');
+        const { data: existingData, error: queryError } = await supabase
+            .from(TABLE.VIDEO)
+            .select('id')
+            .ilike('name', name);
 
+        if (queryError) throw queryError;
+
+        if (existingData && existingData.length > 0) {
+            tips('该名称已存在，请使用其他名称', 'error');
+            return;
+        }
 
         tips('正在创建数据...', 'info');
         const { data, error } = await supabase
@@ -398,7 +406,7 @@ async function updateItem() {
     // if (!(await validatePermission('update'))) return;
     // ID和名称至少要有一个
     const id = document.getElementById('id').value;
-    const name = document.getElementById('name').value;
+    const name = document.getElementById('name').value.trim();
     var modify_field = id ? 'id' : 'name';
     var modify_value = id ? id : name;
 
@@ -415,7 +423,7 @@ async function updateItem() {
         const { error } = await supabase
             .from(TABLE.VIDEO)
             .update({
-                name: document.getElementById('name').value,
+                name: document.getElementById('name').value.trim(),
                 type: document.getElementById('type').value,
                 country: document.getElementById('country').value,
                 initial: document.getElementById('initial').value,
@@ -641,7 +649,7 @@ async function updateTableDisplay(data = null) {
     tips('加载表格数据成功', 'success');
 }
 
-// 显示记录
+// 更新记录显示
 function updateRecordsDisplay(data) {
     const grouped = data.reduce((acc, item) => {
         const letter = item.initial;
@@ -911,6 +919,28 @@ async function sortTable() {
     updateDeleteDisplay(0);
 }
 
+// 查找重复记录
+async function findDuplicate() {
+    tips('正在查找重复数据...', 'info');
+    // 依赖于数据库函数 find_duplicates
+    const { data, error } = await supabase
+        .rpc('find_duplicates')
+        .select('*');
+    console.log('查找重复数据:', data, error);
+
+    if (error) {
+        tips('查询失败: ' + error.message, 'error');
+    } else {
+        if (data.length > 0) {
+            tips(`找到 ${data.length} 条重复记录`, 'warning');
+            updateUIComponents(data);
+            // clearValue();
+            // searchItem(false);
+        } else {
+            tips('未找到重复记录', 'success');
+        }
+    }
+}
 
 
 
