@@ -212,7 +212,7 @@ function getCurrentFilters() {
 // ======================== 缓存管理模块 ========================
 
 
-// ======================== 数据库操作模块 ========================
+// ======================== 数据操作模块 ========================
 /** 通用数据库查询方法
  * @param {Object} filters 筛选条件
  * @param {boolean} useCache 是否使用缓存
@@ -273,6 +273,51 @@ function buildBaseQuery(filters) {
     });
 
     return query;
+}
+
+// 获取表单数据
+function getForm(ignore = [], inuse = []) {
+    // 判断ignore或inuse是否任一一个为数组
+    if (!Array.isArray(ignore) && !Array.isArray(inuse)) {
+        console.error('ignore和inuse必须是数组');
+        return null;
+    }
+
+
+    // 在ignore中添加需要忽略的字段，返回结果时候便不包含忽略的字段
+    // ignore = [...ignore];
+    const formData = {
+        id: document.getElementById('id').value,
+        name: document.getElementById('name').value.trim(),
+        type: document.getElementById('type').value,
+        country: document.getElementById('country').value,
+        initial: document.getElementById('initial').value.trim().toUpperCase(),
+        watched: document.getElementById('watched').checked ? 1 : 0,
+        createtime: new Date().toLocaleString(),
+        updatetime: new Date().toLocaleString()
+    };
+    var useData = { ...formData };
+
+    if (inuse.length > 0) {
+        // 将formData中与inuse字段相同的字段，赋值给useData
+        inuse.forEach(field => {
+            if (formData.hasOwnProperty(field)) {
+                useData[field] = formData[field];
+            }
+        });
+    } else {
+        ignore.forEach(field => {
+            if (formData.hasOwnProperty(field)) {
+                delete useData[field];
+            }
+        });
+    }
+    // console.group('getFormData', formData, Object.keys(formData).length);
+    // console.log('ignore:', ignore, Object.keys(ignore).length);
+    // console.log('inuse:', inuse, Object.keys(inuse).length);
+    // console.log('返回useData:', useData, Object.keys(useData).length)
+    // console.groupEnd('getFormData');
+    return useData;
 }
 
 
@@ -362,14 +407,8 @@ async function createItem() {
         tips('名称不能为空', 'warning');
         return;
     }
-    const newItem = {
-        name: document.getElementById('name').value.trim(),
-        type: document.getElementById('type').value,
-        country: document.getElementById('country').value,
-        initial: document.getElementById('initial').value,
-        watched: document.getElementById('watched').checked ? 1 : 0,
-        createtime: new Date().toLocaleString()
-    };
+    // 获取表单数据
+    const newItem = getForm(['id']);
     try {
         tips('正在检查重复名称...', 'info');
         const { data: existingData, error: queryError } = await supabase
@@ -419,17 +458,12 @@ async function updateItem() {
             tips('操作已取消', 'log');
             return;
         }
+        // 获取表单数据，不需要 “id、创建时间”
+        const getItem = getForm(['createtime']);
         tips('正在修改数据...', 'info');
         const { error } = await supabase
             .from(TABLE.VIDEO)
-            .update({
-                name: document.getElementById('name').value.trim(),
-                type: document.getElementById('type').value,
-                country: document.getElementById('country').value,
-                initial: document.getElementById('initial').value,
-                watched: document.getElementById('watched').checked ? 1 : 0,
-                createtime: new Date().toLocaleString()
-            })
+            .update([getItem])
             .eq(modify_field, modify_value);
         if (!error) {
             // const cachedData = getCache().map(item =>
@@ -525,10 +559,10 @@ async function toggleWatched(id, currentStatus) {
     tips('正在更新状态...', 'info');
     const { error } = await supabase
         .from(TABLE.VIDEO)
-        .update({
+        .update([{
             watched: !currentStatus ? 1 : 0,
-            createtime: new Date().toLocaleString()
-        })
+            updatetime: new Date().toLocaleString()
+        }])
         .eq('id', id);
 
     if (!error) {
@@ -542,6 +576,29 @@ async function toggleWatched(id, currentStatus) {
         tips(`已标记为${!currentStatus ? '已看' : '未看'}`, 'success');
     } else {
         tips('状态更新失败', 'error');
+    }
+}
+
+// 查找重复记录
+async function findDuplicate() {
+    tips('正在查找重复数据...', 'info');
+    // 依赖于数据库函数 find_duplicates
+    const { data, error } = await supabase
+        .rpc('find_duplicates')
+        .select('*');
+    console.log('查找重复数据:', data, error);
+
+    if (error) {
+        tips('查询失败: ' + error.message, 'error');
+    } else {
+        if (data.length > 0) {
+            tips(`找到 ${data.length} 条重复记录`, 'warning');
+            updateUIComponents(data);
+            // clearValue();
+            // searchItem(false);
+        } else {
+            tips('未找到重复记录', 'success');
+        }
     }
 }
 
@@ -620,7 +677,6 @@ async function updateTableDisplay(data = null) {
 
     const tbody = document.querySelector('#dataTable tbody');
     tbody.innerHTML = '';
-
     data.forEach((item, index) => {
         const row = document.createElement('tr');
         row.id = `row_${item.id}`;
@@ -638,7 +694,8 @@ async function updateTableDisplay(data = null) {
                     ${item.watched ? '标记未看' : '标记已看'}
                 </button>
             </td>
-            <td>${new Date(item.createtime).toLocaleString()}</td>
+            <!-- <td>${new Date(item.createtime).toLocaleString()}</td> -->
+            <td>${item.updatetime = null ? '-' : new Date(item.updatetime).toLocaleString()}</td>
             <td>
                 <button onclick="readItem('${item.id}')" data-button="update" >修改</button>
                 <button onclick="deleteItem('${item.id}')">删除</button>
@@ -671,7 +728,8 @@ function updateRecordsDisplay(data) {
                     <span class="text_content">[${item.id}]&nbsp;</span>
                     <span class="text_content canSelect">${item.name}</span>
                     <span class="text_content">&nbsp;- ${item.type}（${item.country}）</span>
-                    <small>${new Date(item.createtime).toLocaleString()}</small>
+                    <!-- <small>${new Date(item.createtime).toLocaleString()}</small> -->
+                    <small></small>
                     <button class="toggle_btn ${item.watched ? 'watched' : 'unwatched'}" 
                             onclick="toggleWatched(${item.id}, ${item.watched})">
                         ${item.watched ? '标记未看' : '标记已看'}
@@ -694,7 +752,8 @@ function updateCountDisplay(data) {
 
 // 更新删除数显示
 function updateDeleteDisplay(data = null) {
-    document.getElementById('deletedCount').textContent = data || document.querySelectorAll('tr.multiple').length;
+    document.getElementById('deletedCount').textContent = data
+        || document.querySelectorAll('tr.multiple').length;
 }
 
 // 填充表单字段
@@ -706,26 +765,6 @@ function fillForm(data) {
     document.getElementById('initial').value = data.initial;
     document.getElementById('watched').checked = data.watched === 1;
     document.getElementById('unwatched').checked = data.watched === 0;
-}
-
-// 滚动到底部
-function scrollToBottom() {
-    const tableBody = document.querySelector('.dataTable');
-    tableBody.scrollTo({
-        top: tableBody.scrollHeight,
-        behavior: 'smooth'
-    });
-
-    // 如果指定了行ID，则滚动到该行
-    // const container = document.querySelector('.dataTable');
-    // const rowTop = row.offsetTop;
-    // const rowHeight = row.offsetHeight;
-    // const containerHeight = container.offsetHeight;
-
-    // container.scrollTo({
-    //     top: rowTop - containerHeight + rowHeight + 20, // 加20像素缓冲
-    //     behavior: 'smooth'
-    // });
 }
 
 // 高亮效果函数
@@ -919,27 +958,24 @@ async function sortTable() {
     updateDeleteDisplay(0);
 }
 
-// 查找重复记录
-async function findDuplicate() {
-    tips('正在查找重复数据...', 'info');
-    // 依赖于数据库函数 find_duplicates
-    const { data, error } = await supabase
-        .rpc('find_duplicates')
-        .select('*');
-    console.log('查找重复数据:', data, error);
+// 滚动到底部
+function scrollToBottom() {
+    const tableBody = document.querySelector('.dataTable');
+    tableBody.scrollTo({
+        top: tableBody.scrollHeight,
+        behavior: 'smooth'
+    });
 
-    if (error) {
-        tips('查询失败: ' + error.message, 'error');
-    } else {
-        if (data.length > 0) {
-            tips(`找到 ${data.length} 条重复记录`, 'warning');
-            updateUIComponents(data);
-            // clearValue();
-            // searchItem(false);
-        } else {
-            tips('未找到重复记录', 'success');
-        }
-    }
+    // 如果指定了行ID，则滚动到该行
+    // const container = document.querySelector('.dataTable');
+    // const rowTop = row.offsetTop;
+    // const rowHeight = row.offsetHeight;
+    // const containerHeight = container.offsetHeight;
+
+    // container.scrollTo({
+    //     top: rowTop - containerHeight + rowHeight + 20, // 加20像素缓冲
+    //     behavior: 'smooth'
+    // });
 }
 
 

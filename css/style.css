@@ -499,8 +499,18 @@ li {
     flex-grow: 1;
 }
 
+.id_input{
+    flex: 1 2 100px;
+    height: 40px;
+    padding: 0 15px;
+    border: 2px solid #e0e7ff;
+    border-radius: 8px;
+    transition: all 0.3s;
+    background: #f8fafe;
+}
+
 .smart_input {
-    flex: 1 1 200px;
+    flex: 2 1 200px;
     height: 40px;
     padding: 0 15px;
     border: 2px solid #e0e7ff;
@@ -535,6 +545,7 @@ li {
 
 .short_input {
     outline: none;
+    flex: 1 4 50px;
     width: 80px;
     text-align: center;
     height: 40px;
@@ -660,7 +671,7 @@ label[for="unwatched"] {
     box-shadow: 0 0 8px rgba(64, 158, 255, 0.2);
 }
 
-.button_jump {
+.button_short {
     width: 80px;
 }
 
@@ -744,12 +755,21 @@ label[for="unwatched"] {
 .letter_group h3 {
     margin: 0 0 5px 0;
     padding: 8px 15px;
-    background: #f5f7fa;
+    background: #e9f1fd;
     border-radius: 6px;
     color: #2e2e2e;
     font-size: 18px;
     display: inline-block;
     border-left: 4px solid #409eff;
+}
+
+/* 给 h3 添加粘性定位基础样式 */
+.letter_group h3 {
+    position: sticky;
+    top: 20px;
+    /* 触发粘性定位的阈值 */
+    z-index: 100;
+    /* 防止内容透视 */
 }
 
 .letter_group div {
@@ -798,6 +818,11 @@ label[for="unwatched"] {
     font-size: 16px;
 }
 
+.letter_group>div :nth-child(1){
+    padding-left: 5px;
+}
+
+
 .watched_item .text_content {
     color: #bbbbbb;
     text-decoration: line-through;
@@ -805,7 +830,7 @@ label[for="unwatched"] {
 }
 
 .watched_item small {
-    color: #bbbbbb;
+    color: #bbbbbb !important;
     text-decoration: line-through;
     opacity: 0.7;
 }

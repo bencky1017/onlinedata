@@ -75,10 +75,10 @@
                 <option value="true">A→Z 正序</option>
                 <option value="false">Z→A 倒序</option>
             </select>
-            <button data-button="create" class="button_jump" onclick="location.href='#controlPanel'">跳转</button>
-            <button data-button="info" class="button_jump" onclick="clearAllSelections()">取消选择</button>
-            <button data-button="query" class="button_jump" onclick="scrollToBottom()">📌底部</button>
-            <button data-button="delete" class="button_jump" onclick="findDuplicate()">查重</button>
+            <button data-button="create" class="button_short" onclick="location.href='#controlPanel'">跳转</button>
+            <button data-button="info" class="button_short" onclick="clearAllSelections()">取消选择</button>
+            <button data-button="query" class="button_short" onclick="scrollToBottom()">📌底部</button>
+            <button data-button="delete" class="button_short" onclick="findDuplicate()">查重</button>
         </div>
         <!-- 表格展示区 -->
         <div class="dataTable">
@@ -128,7 +128,7 @@
             <!-- 搜索条件区域 -->
             <div class="filter_group">
                 <div class="input_group">
-                    <input type="number" id="id" placeholder="ID" class="smart_input" min="1">
+                    <input type="number" id="id" placeholder="ID" class="id_input" min="1">
                     <input type="text" id="name" placeholder="作品名称" class="smart_input">
                     <select id="type" class="select_input">
                         <option value="">- 类型 -</option>
@@ -137,17 +137,18 @@
                         <option value="">- 国籍 -</option>
                     </select>
                     <input type="text" id="initial" placeholder="首字母" class="short_input" maxlength="1">
-                </div>
-                <div class="watch_group">
-                    <label for="watched">
-                        <input type="checkbox" id="watched" value="已看" onclick="toggleCheckbox('watched', 'unwatched')">
-                        <span>已看</span>
-                    </label>
-                    <label for="unwatched">
-                        <input type="checkbox" id="unwatched" value="未看"
-                            onclick="toggleCheckbox('unwatched', 'watched')">
-                        <span>未看</span>
-                    </label>
+                    <div class="watch_group">
+                        <label for="watched">
+                            <input type="checkbox" id="watched" value="已看"
+                                onclick="toggleCheckbox('watched', 'unwatched')">
+                            <span>已看</span>
+                        </label>
+                        <label for="unwatched">
+                            <input type="checkbox" id="unwatched" value="未看"
+                                onclick="toggleCheckbox('unwatched', 'watched')">
+                            <span>未看</span>
+                        </label>
+                    </div>
                 </div>
             </div>
             <!-- 操作按钮区域 -->
