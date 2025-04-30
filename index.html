@@ -12,7 +12,9 @@
 <body>
     <div class="top_nav">
         <h1 class="main_title">🎬影视作品管理平台</h1>
+        <!-- 登录按钮 -->
         <div class="auth_buttons">
+            <button data-button="update" class="notice_trigger notice_btn">公告</button>
             <button id="loginBtn" class="login_btn" onclick="handleAuth('login')">登录</button>
             <button id="registerBtn" class="register_btn" onclick="handleAuth('register')">注册</button>
         </div>
@@ -61,11 +63,15 @@
         </div>
     </div>
     <!-- 修改操作按钮 -->
-    <!-- <div>
+    <div class="debug_panel" id="debugPanel" style="display: none;">
+        <span>调试区：</span>
         <button data-admin onclick="deleteItem()">删除</button>
         <button data-admin onclick="updateItem()">修改</button>
         <button data-user onclick="createItem()">新增</button>
-    </div> -->
+        <button data-button="update" onclick="test()">提示</button>
+        <button class="show" data-button="create" onclick="changeShow()">切换显示</button>
+        <button class="notice_trigger">📢公告</button>
+    </div>
     <div class="container">
         <!-- 顶部操作区 -->
         <div class="fore_panel">
@@ -95,18 +101,6 @@
                         <th>操作</th>
                     </tr>
                 </thead>
-                <!-- <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Type</th>
-                                <th>Country</th>
-                                <th>Initial</th>
-                                <th>Watched</th>
-                                <th>CreateTime</th>
-                                <th>Operation</th>
-                            </tr>
-                        </thead> -->
                 <tbody>
                     <!-- 表格数据将通过 JavaScript 动态填充到这里 -->
                 </tbody>
@@ -176,6 +170,21 @@
         <!-- 结果展示区 -->
         <div class="records" id="records"></div>
         <hr />
+        <!-- 信息展示区 -->
+        <!-- 公告模块 -->
+        <div class="notice_popup">
+            <div class="notice_mask"></div>
+            <div class="notice_container">
+                <div class="notice_header">
+                    <h3 class="notice_title">📢 公告</h3>
+                    <button class="notice_close" data-button="delete">&times;</button>
+                </div>
+                <div class="notice_content">
+                    <!-- 内容通过JS动态加载 -->
+                </div>
+            </div>
+        </div>
+
     </div>
     <script src="https://unpkg.com/pinyin-pro@3"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>

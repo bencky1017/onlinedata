@@ -50,7 +50,7 @@ function test() {
     // 延迟1秒后
     setTimeout(() => {
         tips('测试提示条default', 'default');
-    }, 1500);
+    }, 1000);
     setTimeout(() => {
         tips('测试提示条success', 'success');
     }, 2000);
@@ -66,8 +66,25 @@ function test() {
     setTimeout(() => {
         tips('测试提示条log', 'log');
     }, 6000);
+}
 
+function changeShow() {
+    const debugPanel = document.querySelector('.debug_panel button[data-button="create"]');
 
+    const tbody = document.getElementsByTagName('tbody');
+    const records = document.getElementById('records');
+    // 如果按钮的class包含show，则切换为hide并修改这两个显示为none，否则切换为show并修改这两个显示为block
+    if (debugPanel.classList.contains('show')) {
+        debugPanel.classList.remove('show');
+        debugPanel.classList.add('hide');
+        tbody[0].style.display = 'none';
+        records.style.display = 'none';
+    } else {
+        debugPanel.classList.remove('hide');
+        debugPanel.classList.add('show');
+        tbody[0].style.display = '';
+        records.style.display = 'block';
+    }
 }
 
 
@@ -91,6 +108,7 @@ function initApplication() {
     initEventListeners();// 初始化事件监听器
     searchItem();// 查询数据
     loadOptions();// 加载下拉选项
+    initNoticeSystem(); // 加载公告
 }
 
 // ======================== 通用工具方法 ========================
@@ -607,10 +625,10 @@ async function findDuplicate() {
 
 // 初始化事件监听器
 function initEventListeners() {
+    // document.querySelectorAll('[data-admin], [data-user]').forEach(el => {
+    //     el.style.display = 'none';
+    // });
     document.getElementById('name').addEventListener('input', handleNameInput);
-    document.querySelectorAll('[data-admin], [data-user]').forEach(el => {
-        el.style.display = 'none';
-    });
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Shift') isShiftPressed = true;
     });
@@ -786,6 +804,76 @@ function closeModal(event) {
     if (modal) {
         modal.style.display = 'none';
     }
+}
+
+// 加载公告
+function initNoticeSystem() {
+    const popup = document.querySelector('.notice_popup');
+    const trigger = document.querySelector('.notice_trigger');
+    const closeBtn = document.querySelector('.notice_close');
+
+    // 打开弹窗
+    trigger.addEventListener('click', async () => {
+        try {
+            const response = await fetch('./js/notice.json');
+            const data = await response.json();
+            renderNoticeContent(data);
+            popup.classList.add('active');
+        } catch (error) {
+            console.error('公告加载失败:', error);
+            popup.classList.add('active');
+            renderErrorContent();
+        }
+    });
+
+    // 关闭弹窗
+    function closePopup() {
+        popup.classList.remove('active');
+    }
+
+    closeBtn.addEventListener('click', closePopup);
+    popup.querySelector('.notice_mask').addEventListener('click', closePopup);
+}
+
+// 渲染公告内容
+function renderNoticeContent(data) {
+    const content = document.querySelector('.notice_content');
+
+    content.innerHTML = `
+        <div class="notice_section">
+        <h4 class="section_title">🎉 最新公告</h4>
+        <ul class="notice_list">
+            ${data.notices.map(n => `<li class="notice_item">${n}</li>`).join('')}
+        </ul>
+        </div>
+        
+        <div class="notice_section">
+        <h4 class="section_title">✨ 版本更新</h4>
+        <div class="update_list">
+            ${data.updates.map(update => `
+            <div class="update_item">
+                <div class="version_header">
+                <span class="version_tag">${update.version}</span>
+                <span class="version_date">${update.date}</span>
+                </div>
+                <ul class="feature_list">
+                ${update.features.map(f => `<li class="feature_item">${f}</li>`).join('')}
+                </ul>
+            </div>
+            `).join('')}
+        </div>
+        </div>
+    `;
+}
+
+// 渲染错误状态
+function renderErrorContent() {
+    document.querySelector('.notice_content').innerHTML = `
+        <div class="notice_error">
+        <p>⚠️ 公告内容加载失败，请稍后再试</p>
+        <button onclick="location.reload()">刷新页面</button>
+        </div>
+    `;
 }
 
 
