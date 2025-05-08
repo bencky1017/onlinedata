@@ -421,6 +421,10 @@ async function createItem() {
     // if (!(await validatePermission('create'))) return;
 
     const name = document.getElementById('name').value.trim();
+    if (/[<>]/.test(name)) {// 中文\u4e00-\u9fa5
+        tips('名称包含特殊字符，请重新输入', 'error');
+        return;
+    }
     if (!name) {
         tips('名称不能为空', 'warning');
         return;
@@ -466,7 +470,10 @@ async function updateItem() {
     const name = document.getElementById('name').value.trim();
     var modify_field = id ? 'id' : 'name';
     var modify_value = id ? id : name;
-
+    if (/[<>]/.test(name)) {// 中文\u4e00-\u9fa5
+        tips('名称包含特殊字符，请重新输入', 'error');
+        return;
+    }
     if (modify_value) {
         // 构建确认信息
         const randMsg = `${modify_field == 'id' ? 'ID：' + id : 'name：' + name}`;
@@ -813,7 +820,8 @@ function initNoticeSystem() {
     const closeBtn = document.querySelector('.notice_close');
 
     // 打开弹窗
-    trigger.addEventListener('click', async () => {
+    trigger.onclick = async () => {
+        // trigger.addEventListener('click', async () => {
         try {
             const response = await fetch('./js/notice.json');
             const data = await response.json();
@@ -824,7 +832,8 @@ function initNoticeSystem() {
             popup.classList.add('active');
             renderErrorContent();
         }
-    });
+        // });
+    };
 
     // 关闭弹窗
     function closePopup() {
