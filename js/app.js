@@ -10,6 +10,7 @@ const TABLE = {
     TEST: 'test',
     TYPE: 'videoType',
     COUNTRY: 'videoCountry',
+    CATEGORY: 'videoCategory',
     VIDEO: 'test'
     // VIDEO: 'onlineVideo'
 };
@@ -186,6 +187,7 @@ function clearValue(selectors, showTip = false) {
         'name',
         'type',
         'country',
+        'category',
         'initial',
         'watched',
         'unwatched',
@@ -219,6 +221,7 @@ function getCurrentFilters() {
         name: document.getElementById('name').value.trim(),
         type: document.getElementById('type').value,
         country: document.getElementById('country').value,
+        category: document.getElementById('category').value,
         initial: document.getElementById('initial').value.trim().toUpperCase(),
         watched: document.getElementById('watched').checked,
         unwatched: document.getElementById('unwatched').checked,
@@ -272,6 +275,7 @@ function buildBaseQuery(filters) {
     if (filters.name) query = query.ilike('name', `%${filters.name}%`);
     if (filters.type) query = query.eq('type', filters.type);
     if (filters.country) query = query.eq('country', filters.country);
+    if (filters.category) query = query.eq('category', filters.category);
     if (filters.initial) query = query.eq('initial', filters.initial);
     if (filters.watched) query = query.eq('watched', 1);
     if (filters.unwatched) query = query.eq('watched', 0);
@@ -309,6 +313,7 @@ function getForm(ignore = [], inuse = []) {
         name: document.getElementById('name').value.trim(),
         type: document.getElementById('type').value,
         country: document.getElementById('country').value,
+        category: document.getElementById('category').value,
         initial: document.getElementById('initial').value.trim().toUpperCase(),
         watched: document.getElementById('watched').checked ? 1 : 0,
         createtime: new Date().toLocaleString(),
@@ -381,8 +386,8 @@ async function readItem(id) {
         // 方法一
         const rowId = document.getElementById(`row_${id}`);
         const tds = rowId.querySelectorAll('td');
-        const formFields = ['id', 'name', 'type', 'country', 'initial'];
-        const isWatched = tds[5].querySelector('button').classList.contains('watched');
+        const formFields = ['id', 'name', 'type', 'country', 'category', 'initial'];
+        const isWatched = tds[6].querySelector('button').classList.contains('watched');
         formFields.forEach((field, index) => {
             document.getElementById(field).value = tds[index].innerHTML;
         });
@@ -407,6 +412,7 @@ async function readItem(id) {
         tips('读取成功', 'success');
     } catch (error) {
         tips(`读取失败: ${error.message}`, 'error');
+        console.error(error);
     }
 }
 
@@ -712,6 +718,7 @@ async function updateTableDisplay(data = null) {
             <td class="canSelect">${item.name}</td>
             <td>${item.type}</td>
             <td>${item.country}</td>
+            <td>${item.category}</td>
             <td>${item.initial}</td>
             <td>
                 <button class="toggle_btn ${item.watched ? 'watched' : 'unwatched'}" 
@@ -752,7 +759,7 @@ function updateRecordsDisplay(data) {
                 <div class="${item.watched ? 'watched_item' : ''}">
                     <span class="text_content">[${item.id}]&nbsp;</span>
                     <span class="text_content canSelect">${item.name}</span>
-                    <span class="text_content">&nbsp;- ${item.type}（${item.country}）</span>
+                    <span class="text_content">&nbsp;- ${item.type}（${item.country}）${item.category}</span>
                     <!-- <small>${new Date(item.createtime).toLocaleString()}</small> -->
                     <small></small>
                     <button class="toggle_btn ${item.watched ? 'watched' : 'unwatched'}" 
@@ -787,6 +794,7 @@ function fillForm(data) {
     document.getElementById('name').value = data.name;
     document.getElementById('type').value = data.type;
     document.getElementById('country').value = data.country;
+    document.getElementById('category').value = data.category;
     document.getElementById('initial').value = data.initial;
     document.getElementById('watched').checked = data.watched === 1;
     document.getElementById('unwatched').checked = data.watched === 0;
@@ -921,7 +929,6 @@ function submitRegister() {
     // }
 }
 
-
 // 登录函数
 async function handleLogin() {
     const registerModal = document.getElementById('registerModal');
@@ -1005,6 +1012,7 @@ async function handleRegister() {
 async function loadOptions() {
     await loadTypeOptions();
     await loadCountryOptions();
+    await loadcategoryOptions();
 }
 
 // 加载类型选项
@@ -1017,6 +1025,12 @@ async function loadTypeOptions() {
 async function loadCountryOptions() {
     const { data } = await supabase.from(TABLE.COUNTRY).select('*');
     populateSelect('country', data, 'countryname');
+}
+
+// 加载类别选项
+async function loadcategoryOptions() {
+    const { data } = await supabase.from(TABLE.CATEGORY).select('*');
+    populateSelect('category', data, 'categoryname');
 }
 
 // 填充下拉列表
